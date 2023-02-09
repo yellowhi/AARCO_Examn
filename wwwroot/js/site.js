@@ -151,28 +151,87 @@
                 data: JSON.stringify({DescripcionId: id}),
                 success: function (response) {
                     console.log("DataRequest: ", response);
-                    $.ajax({
-                        cache: false,
-                        async: true,
-                        type: "GET",
-                        url: 'https://api-test.aarco.com.mx/api-examen/api/examen/peticion/'+ response,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        success: function (response) {
-                            console.log("LastRequest: ", response);
+                    $("#CotizadoModal").modal("show");
+                    $("#aseguradoras").hide();
+                    $("#text").show();
+                    var resp = "";
+                    setTimeout(() => {
+                        do {
+                            $.ajax({
+                                cache: false,
+                                async: false,
+                                type: "GET",
+                                url: 'https://api-test.aarco.com.mx/api-examen/api/examen/peticion/' + response,
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                success: function (LatestResponse) {
+                                    console.log("LastRequest: ", LatestResponse);
+                                    resp = LatestResponse.aseguradoras;
+                                    var html = "";
+                                    for (var i = 0; i < resp.length; i++) {
+                                        
+                                            switch (resp[i].AseguradoraId) {
+                                                case 1:
+                                                    html += '<div class="p-2 border rounded m-2" b-jx43yyaf2f=""><img src="images/AXA.png" class="rounded" style="width: 100px; height: auto;" alt="Aseguradora ..."><pclass="my-0 mt-2 mx-auto fw-bold text-center">$' + resp[i].Tarifa + '</p></div>';
+                                                    break;
+                                                case 2:
+                                                    html += '<div class="p-2 border rounded m-2" b-jx43yyaf2f=""><img src="images/CHUBB.png" class="rounded" style="width: 100px; height: auto;" alt="Aseguradora ..."><pclass="my-0 mt-2 mx-auto fw-bold text-center">$' + resp[i].Tarifa + '</p></div>';
+                                                    break;
+                                                case 3:
+                                                    html += '<div class="p-2 border rounded m-2" b-jx43yyaf2f=""><img src="images/ZURICH.png" class="rounded" style="width: 100px; height: auto;" alt="Aseguradora ..."><pclass="my-0 mt-2 mx-auto fw-bold text-center">$' + resp[i].Tarifa + '</p></div>';
+                                                    break;
+                                                case 4:
+                                                    html += '<div class="p-2 border rounded m-2" b-jx43yyaf2f=""><img src="images/QUALITAS.png" class="rounded" style="width: 100px; height: auto;" alt="Aseguradora ..."><pclass="my-0 mt-2 mx-auto fw-bold text-center">$' + resp[i].Tarifa + '</p></div>';
+                                                    break;
+                                                case 5:
+                                                    html += '<div class="p-2 border rounded m-2" b-jx43yyaf2f=""><img src="images/HDI.png" class="rounded" style="width: 100px; height: auto;" alt="Aseguradora ..."><pclass="my-0 mt-2 mx-auto fw-bold text-center">$' + resp[i].Tarifa + '</p></div>';
+                                                    break;
+                                            }
+                                            
+                                        
+                                    }
+                                    $("#text").hide();
+                                    $("#aseguradoras").append(html);
+                                    $("#aseguradoras").show();
+                                },
+                                error: function () {
+                                    alert('Ocurio un error inesperado');
+                                }
+                            });
+                        
+                        } while (resp.PeticionFinalizada == false || resp == "");
+                    }, 19000);
+                    
+                    console.log("Aseguradoras", resp);
+                    
 
-                        },
-                        error: function () {
-                            alert('Ocurio un error inesperado')
-                        }
-
-                    });
                 },
                 error: function () {
                     alert('Ocurio un error inesperado')
                 }
 
             });
+        },
+        RequestTimer: function (id) {
+            var res;
+            $.ajax({
+                cache: false,
+                async: true,
+                type: "GET",
+                url: 'https://api-test.aarco.com.mx/api-examen/api/examen/peticion/' + id,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    console.log("LastRequest: ", response);
+                    res = response;
+                    return res;
+                },
+                error: function () {
+                    alert('Ocurio un error inesperado');
+
+                }
+            });
+            
         },
         UserInteraction: function () {
             $("#MarcaSelect").on('change', function () {
@@ -198,7 +257,9 @@
             });
             $("#SubmitBtn").click(function () {
                 var descripcion = $("#DescripcionSelect").val();
-                if (descripcion != 0 && descripcion != "") {
+                var pc = $("#PostalCode").val();
+                var colonia = $("#Colonia").val();
+                if (descripcion != 0 && descripcion != "" && (pc != null || pc != 0 ) && colonia != 0) {
                     aarco.PostDataRequest(descripcion);
                 } else {
                     alert("complete todos los campos");
