@@ -1,0 +1,15 @@
+﻿@model List<AARCO_Examn.Models.Marca>
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<h1>Index</h1>
+
+@foreach (var marca in Model)
+{
+    <div>
+        @marca.Id
+        @marca.Nombre
+    </div>
+}
